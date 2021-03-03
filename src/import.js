@@ -96,7 +96,15 @@ aha.on(
 // Prepare a single record for import.
 aha.on(
   { import: "aha-develop.github-import.issues", action: "importRecord" },
-  async (record, { teamId }) => {
-    // Update ahaRecord to prepare it for save. Potentially making API calls to the other system to fetch more information as necessary.
+  async (record, { team }) => {
+    // Add `record` to Aha!, potentially making API calls to the other system to fetch more information as necessary.
+    const feature = new aha.models.Feature({
+      name: record.title,
+      team,
+    });
+
+    await feature.save();
+
+    return feature;
   }
 );
