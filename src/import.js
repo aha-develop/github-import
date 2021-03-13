@@ -57,8 +57,12 @@ aha.on(
     }
 `);
 
-        console.log(search);
-        results = search.nodes;
+        results = search.nodes.map((result) => ({
+          id: result.id,
+          identifier: "#" + result.number,
+          name: result.title,
+          url: result.url,
+        }));
       });
     } else {
       console.log("no match");
@@ -72,24 +76,7 @@ aha.on(
 aha.on(
   { import: "aha-develop.github-import.issues", action: "renderRecord" },
   (record, element) => {
-    element.innerHTML = `
-<div class="card card--unstyled">
-  <div class="card__body-wrapper">
-    <div class="card__body">
-      <div class="card__row">
-        <div class="card__section"><div class="card__field">#${record.number}</div></div>
-        <div class="card__section"></div>
-      </div>
-      <div class="card__row">
-        <div class="card__section"><div class="card__field">${record.title}</div></div>
-        <div class="card__section"></div>
-      </div>
-      <div class="card__row"><div class="card__section"></div><div class="card__section"></div>
-      </div>
-    </div>
-  </div>
-</div>
-`;
+    return `${record.identifier}<br /><a href="${record.url}">${record.name}</a>`;
   }
 );
 
@@ -99,7 +86,7 @@ aha.on(
   async (record, { teamId }) => {
     // Add `record` to Aha!, potentially making API calls to the other system to fetch more information as necessary.
     const feature = new aha.models.Feature({
-      name: record.title,
+      name: record.name,
       team: { id: teamId },
     });
 
