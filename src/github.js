@@ -1,5 +1,54 @@
 import { graphql } from "https://cdn.skypack.dev/@octokit/graphql";
 
+const AUTOCOMPLETE_USERS = `
+  query searchUsers($userQuery: String!) {
+    search(query: $userQuery, type: USER, first:10 ) {
+      nodes {
+        __typename
+        ... on User {
+          login
+        }
+        ... on Organization {
+          login
+        }
+      }
+    }
+  }
+`;
+
+const AUTOCOMPLETE_REPOS = `
+ query searchRepos($repoQuery: String!) {
+    search(query: $repoQuery, type: REPOSITORY, first:10 ) {
+      nodes {
+        __typename
+        ... on Repository {
+          nameWithOwner
+        }
+      }
+    }
+  }
+`;
+
+const SEARCH_ISSUES = `
+  query searchIssues($issueQuery: String!, $cursor: String) {
+    search(query:$issueQuery, type: ISSUE, first:20, after:$cursor ) {
+      nodes {
+        __typename
+        ... on Issue {
+          id
+          number
+          title
+          url
+          state
+        }
+      }
+      pageInfo {
+        endCursor
+      }
+    }
+  }
+`;
+
 export async function withGitHubApi(callback) {
   await aha.auth(
     "github",
@@ -26,21 +75,9 @@ export async function autocompleteRepo(query) {
   const [owner, repo] = query.split("/");
   if (repo === undefined) {
     await withGitHubApi(async (api) => {
-      const { search } = await api(`
-   {
-      search(query:"${owner}", type: USER, first:10 ) {
-        nodes {
-          __typename
-          ... on User {
-            login
-          }
-          ... on Organization {
-            login
-          }
-        }
-      }
-    }
-`);
+      const { search } = await api(AUTOCOMPLETE_USERS, {
+        userQuery: owner,
+      });
 
       results = search.nodes
         .filter((result) => result.login)
@@ -50,18 +87,9 @@ export async function autocompleteRepo(query) {
     });
   } else {
     await withGitHubApi(async (api) => {
-      const { search } = await api(`
-   {
-      search(query:"user:${owner} ${repo}", type: REPOSITORY, first:10 ) {
-        nodes {
-          __typename
-          ... on Repository {
-            nameWithOwner
-          }
-        }
-      }
-    }
-`);
+      const { search } = await api(AUTOCOMPLETE_REPOS, {
+        repoQuery: `user:${owner} ${repo}`,
+      });
 
       results = search.nodes.map((result) => ({
         value: result.nameWithOwner,
@@ -81,25 +109,10 @@ export async function findIssues(repoWithOwner, cursor) {
   if (!repo) return { records, nextPage };
 
   await withGitHubApi(async (api) => {
-    const { search } = await api(`
-   {
-      search(query:"type:issue repo:\\"${repoWithOwner}\\"", type: ISSUE, first:20 ) {
-        nodes {
-          __typename
-          ... on Issue {
-            id
-            number
-            title
-            url
-            state
-          }
-        }
-        pageInfo {
-          endCursor
-        }
-      }
-    }
-`);
+    const { search } = await api(SEARCH_ISSUES, {
+      issueQuery: `type:issue repo:"${repoWithOwner}"`,
+      cursor,
+    });
 
     records = search.nodes.map((result) => ({
       id: result.id,
