@@ -1,42 +1,40 @@
 import { withGitHubApi, autocompleteRepo, findIssues } from "./github";
 
-const gitHubIssuesImporter = {
-  // Return a list of the possible filters.
-  listFilters() {
-    return {
-      repo: {
-        title: "Repository",
-        required: true,
-        type: "text",
-      },
-    };
-  },
+const importer = aha.getImporter("aha-develop.github-import.issues");
 
-  // For a particular filter, provide a list of the possible values.
-  async filterValues({ filterName, filters }) {
-    let values = [];
-    switch (filterName) {
-      case "repo":
-        values = await autocompleteRepo(filters.repo);
-    }
-    return values;
-  },
+// Return a list of the possible filters.
+importer.on({ action: "listFilters" }, () => {
+  return {
+    repo: {
+      title: "Repository",
+      required: true,
+      type: "text",
+    },
+  };
+});
 
-  // Return an array of records from a paginated list of import candidates.
-  async listCandidates({ filters, nextPage }) {
-    return findIssues(filters.repo, nextPage);
-  },
+// For a particular filter, when it is dropped-down, provide a list of the possible values.
+importer.on({ action: "filterValues" }, async ({ filterName, filters }) => {
+  let values = [];
+  switch (filterName) {
+    case "repo":
+      values = await autocompleteRepo(filters.repo);
+  }
+  return values;
+});
 
-  // Render a single record.
-  renderRecord({ record, element }) {
-    return `${record.identifier}<br /><a href="${record.url}" target="_blank" rel="noopener">${record.name}</a>`;
-  },
+// Return an array of records from a paginated list of import candidates.
+importer.on({ action: "listCandidates" }, async ({ filters, nextPage }) => {
+  return findIssues(filters.repo, nextPage);
+});
 
-  // Update a single record following import
-  async importRecord({ importRecord, ahaRecord }) {
-    ahaRecord.name = "[GitHub] " + ahaRecord.name;
-    await ahaRecord.save();
-  },
-};
+// Render a single record.
+importer.on({ action: "renderRecord" }, ({ record, element }) => {
+  return `${record.identifier}<br /><a href="${record.url}" target="_blank" rel="noopener">${record.name}</a>`;
+});
 
-aha.registerImporter("aha-develop.github-import.issues", gitHubIssuesImporter);
+// Prepare a single record for import.
+importer.on({ action: "importRecord" }, async ({ importRecord, ahaRecord }) => {
+  ahaRecord.name = "[GitHub] " + ahaRecord.name;
+  await ahaRecord.save();
+});
