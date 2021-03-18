@@ -115,7 +115,7 @@ export async function findIssues(repoWithOwner, cursor) {
     });
 
     records = search.nodes.map((result) => ({
-      id: result.id,
+      uniqueId: result.id,
       identifier: "#" + result.number,
       name: result.title,
       url: result.url,
