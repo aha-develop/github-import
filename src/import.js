@@ -1,4 +1,4 @@
-import { withGitHubApi, autocompleteRepo, findIssues } from "./github";
+import { autocompleteRepo, findIssues } from "./github";
 
 const importer = aha.getImporter("aha-develop.github-import.issues");
 

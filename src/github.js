@@ -49,23 +49,18 @@ const SEARCH_ISSUES = `
   }
 `;
 
-export async function withGitHubApi(callback) {
-  await aha.auth(
-    "github",
-    {
-      useCachedRetry: true,
-      parameters: { scope: "repo" },
+export async function githubGraphQL() {
+  const authData = await aha.auth("github", {
+    useCachedRetry: true,
+    parameters: { scope: "repo" },
+  });
+  const graphqlWithAuth = graphql.defaults({
+    headers: {
+      authorization: `token ${authData.token}`,
     },
-    async (authData) => {
-      const graphqlWithAuth = graphql.defaults({
-        headers: {
-          authorization: `token ${authData.token}`,
-        },
-      });
+  });
 
-      await callback(graphqlWithAuth);
-    }
-  );
+  return graphqlWithAuth;
 }
 
 export async function autocompleteRepo(query) {
@@ -74,29 +69,27 @@ export async function autocompleteRepo(query) {
 
   const [owner, repo] = query.split("/");
   if (repo === undefined) {
-    await withGitHubApi(async (api) => {
-      const { search } = await api(AUTOCOMPLETE_USERS, {
-        userQuery: owner,
-      });
+    const api = await githubGraphQL();
 
-      results = search.nodes
-        .filter((result) => result.login)
-        .map((result) => ({
-          value: result.login + "/",
-        }));
+    const { search } = await api(AUTOCOMPLETE_USERS, {
+      userQuery: owner,
     });
-  } else {
-    await withGitHubApi(async (api) => {
-      const { search } = await api(AUTOCOMPLETE_REPOS, {
-        repoQuery: `user:${owner} ${repo}`,
-      });
 
-      results = search.nodes.map((result) => ({
-        value: result.nameWithOwner,
+    results = search.nodes
+      .filter((result) => result.login)
+      .map((result) => ({
+        value: result.login + "/",
       }));
+  } else {
+    const api = await githubGraphQL();
+    const { search } = await api(AUTOCOMPLETE_REPOS, {
+      repoQuery: `user:${owner} ${repo}`,
     });
-  }
 
+    results = search.nodes.map((result) => ({
+      value: result.nameWithOwner,
+    }));
+  }
   return results;
 }
 
@@ -108,20 +101,19 @@ export async function findIssues(repoWithOwner, cursor) {
   const [owner, repo] = repoWithOwner.split("/");
   if (!repo) return { records, nextPage };
 
-  await withGitHubApi(async (api) => {
-    const { search } = await api(SEARCH_ISSUES, {
-      issueQuery: `type:issue repo:"${repoWithOwner}"`,
-      cursor,
-    });
-
-    records = search.nodes.map((result) => ({
-      uniqueId: result.id,
-      identifier: "#" + result.number,
-      name: result.title,
-      url: result.url,
-    }));
-    nextPage = search.pageInfo.endCursor;
+  const api = await githubGraphQL();
+  const { search } = await api(SEARCH_ISSUES, {
+    issueQuery: `type:issue repo:"${repoWithOwner}"`,
+    cursor,
   });
+
+  records = search.nodes.map((result) => ({
+    uniqueId: result.id,
+    identifier: "#" + result.number,
+    name: result.title,
+    url: result.url,
+  }));
+  nextPage = search.pageInfo.endCursor;
 
   return { records, nextPage };
 }
