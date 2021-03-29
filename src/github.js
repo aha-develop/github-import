@@ -52,7 +52,7 @@ const SEARCH_ISSUES = `
 export async function githubGraphQL() {
   const authData = await aha.auth("github", {
     useCachedRetry: true,
-    parameters: { scope: "repo" },
+    parameters: { scope: "repo, read:org" },
   });
   const graphqlWithAuth = graphql.defaults({
     headers: {
