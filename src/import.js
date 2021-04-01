@@ -1,3 +1,6 @@
+/** @jsx aha.createElement */
+//import React from "https://cdn.skypack.dev/react";
+
 import { autocompleteRepo, findIssues } from "./github";
 
 const importer = aha.getImporter("aha-develop.github-import.issues");
@@ -28,10 +31,22 @@ importer.on({ action: "listCandidates" }, async ({ filters, nextPage }) => {
   return findIssues(filters.repo, nextPage);
 });
 
-// // Render a single record.
-// importer.on({ action: "renderRecord" }, ({ record, element }) => {
-//   return `${record.identifier}<br /><a href="${record.url}" target="_blank" rel="noopener">${record.name}</a>`;
-// });
+// Render a single record.
+importer.on({ action: "renderRecord" }, ({ record, onUnmounted }) => {
+  onUnmounted(() => {
+    console.log("unmounting component for", record.uniqueId);
+  });
+
+  return (
+    <div>
+      {record.identifier}
+      <br />
+      <a href="${record.url}" target="_blank" rel="noopener">
+        {record.name}
+      </a>
+    </div>
+  );
+});
 
 // Prepare a single record for import.
 importer.on({ action: "importRecord" }, async ({ importRecord, ahaRecord }) => {
