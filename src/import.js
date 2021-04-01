@@ -1,6 +1,3 @@
-/** @jsx aha.createElement */
-//import React from "https://cdn.skypack.dev/react";
-
 import { autocompleteRepo, findIssues } from "./github";
 
 const importer = aha.getImporter("aha-develop.github-import.issues");

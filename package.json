@@ -19,6 +19,7 @@
           "entryPoint": "src/import.js"
         }
       }
-    }
+    },
+    "jsxFactory": "aha.createElement"
   }
 }
