@@ -47,6 +47,6 @@ importer.on({ action: "renderRecord" }, ({ record, onUnmounted }) => {
 
 // Prepare a single record for import.
 importer.on({ action: "importRecord" }, async ({ importRecord, ahaRecord }) => {
-  ahaRecord.name = "[GitHub] " + ahaRecord.name;
-  await ahaRecord.save();
+  ahaRecord.description = `${importRecord.description}<p><a href='${importRecord.url}'>View on GitHub</a></p>`;
+  return ahaRecord.save();
 });

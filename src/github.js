@@ -36,10 +36,10 @@ const SEARCH_ISSUES = `
         __typename
         ... on Issue {
           id
+          bodyHTML
           number
           title
           url
-          state
         }
       }
       pageInfo {
@@ -111,6 +111,7 @@ export async function findIssues(repoWithOwner, cursor) {
     uniqueId: result.id,
     identifier: "#" + result.number,
     name: result.title,
+    description: result.bodyHTML,
     url: result.url,
   }));
   nextPage = search.pageInfo.endCursor;
