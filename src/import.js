@@ -1,9 +1,11 @@
-import { autocompleteRepo, findIssues } from "./github";
+import { authGithub, autocompleteRepo, findIssues } from "./github";
 
 const importer = aha.getImporter("aha-develop.github-import.issues");
 
 // Return a list of the possible filters.
-importer.on({ action: "listFilters" }, () => {
+importer.on({ action: "listFilters" }, async () => {
+  authGithub();
+
   return {
     repo: {
       title: "Repository",
