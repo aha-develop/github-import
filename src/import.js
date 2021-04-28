@@ -38,7 +38,7 @@ importer.on({ action: "renderRecord" }, ({ record, onUnmounted }) => {
     <div>
       {record.identifier}
       <br />
-      <a href="${record.url}" target="_blank" rel="noopener">
+      <a href={`${record.url}`} target="_blank" rel="noopener noreferrer">
         {record.name}
       </a>
     </div>
