@@ -10,7 +10,7 @@ importer.on({ action: "listFilters" }, async () => {
     repo: {
       title: "Repository",
       required: true,
-      type: "text",
+      type: "autocomplete",
     },
   };
 });
