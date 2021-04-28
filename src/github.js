@@ -49,11 +49,15 @@ const SEARCH_ISSUES = `
   }
 `;
 
-export async function githubGraphQL() {
-  const authData = await aha.auth("github", {
+export async function authGithub() {
+  return await aha.auth("github", {
     useCachedRetry: true,
     parameters: { scope: "repo, read:org" },
   });
+}
+
+export async function githubGraphQL() {
+  const authData = await authGithub();
   const graphqlWithAuth = graphql.defaults({
     headers: {
       authorization: `token ${authData.token}`,
