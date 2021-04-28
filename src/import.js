@@ -8,7 +8,7 @@ importer.on({ action: "listFilters" }, () => {
     repo: {
       title: "Repository",
       required: true,
-      type: "text",
+      type: "autocomplete",
     },
   };
 });
