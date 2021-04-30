@@ -1,5 +1,5 @@
 {
-  "name": "aha-develop/github-import",
+  "name": "@aha-develop/github-import",
   "description": "GitHub issue importer",
   "version": "1.0.0",
   "author": "Aha! (support@aha.io)",
