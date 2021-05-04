@@ -83,6 +83,7 @@ export async function autocompleteRepo(query) {
       .filter((result) => result.login)
       .map((result) => ({
         value: result.login + "/",
+        selectable: false,
       }));
   } else {
     const api = await githubGraphQL();
