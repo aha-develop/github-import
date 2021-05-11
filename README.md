@@ -12,7 +12,7 @@ It provides the `aha-develop.github-import.issues` [importer contribution]().
 
 **Note: In order to install an extension into your Aha! Develop account, you must be an account administrator.**
 
-Install the GitHub Issues importer extension by clicking [here](https://secure.aha.io/settings/account/extensions/install?url=).
+Install the GitHub Issues importer extension by clicking [here](https://secure.aha.io/settings/account/extensions/install?url=https%3A%2F%2Fsecure.aha.io%2Fextensions%2Faha-develop.github-import.gz).
 
 ## Working on the extension
 
