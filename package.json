@@ -15,7 +15,7 @@
     "contributes": {
       "importers": {
         "issues": {
-          "title": "GitHub issues",
+          "title": "GitHub",
           "entryPoint": "src/import.js"
         }
       }
