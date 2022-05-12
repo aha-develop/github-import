@@ -19,7 +19,7 @@ Install the GitHub Issues importer extension by clicking [here](https://secure.a
 Install `aha-cli`:
 
 ```sh
- npm install -g aha-cli
+npm install -g aha-cli
 ```
 
 Clone the repo:
